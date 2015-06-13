@@ -34,17 +34,18 @@
             <div class="card-content center-align">
               <h4>Entrar usando:</h4>
             </div>
+
             <div class="card-action">
                 <div class="row">
                     <div class="col s6 center-align">
-                        <a style="color:black" class="center-align" href="{% provider_login_url "github" process="connect" %}">
+                        <a style="color:black" class="center-align" href="{% provider_login_url "github" process="login" %}">
                           <i class="fa fa-github fa-5x center-align"></i>
                           <p class="center-align">Github</p>
                         </a>
                     </div>
 
                     <div class="col s6 center-align">
-                        <a class="center-align" href="{% provider_login_url "google" process="connect" %}">
+                        <a class="center-align" href="{% provider_login_url "google" process="login" %}">
                           <i style="color:#D14836" class="fa fa-google fa-5x center-align"></i>
                           <p style="color:#D14836" class="center-align">Google</p>
                         </a>
