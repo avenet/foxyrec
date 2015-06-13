@@ -9,17 +9,22 @@ from .models import Item, Usuario
 
 @login_required
 def inicio(request):
-    # A HTTP POST?
     if request.method == 'POST':
         form = UsuarioForm(request.POST)
 
         if form.is_valid():
             user = form.save(commit=True)
+            form.instance.usuario = request.user
+            form.instance.save()
             return redirect("loop", user_id=user.user_id)
         else:
             print form.errors
     else:
-        form = UsuarioForm()
+        try:
+            request_user = Usuario.objects.get(usuario__pk=request.user.pk)
+            return redirect("loop", user_id=request_user.user_id)
+        except Usuario.DoesNotExist:
+            form = UsuarioForm()
 
     return render(request, 'add_user.html', {
         'form': form
@@ -28,7 +33,6 @@ def inicio(request):
 
 @login_required
 def loop(request, user_id):
-    # A HTTP POST?
     foto = ""
     desc = ""
 

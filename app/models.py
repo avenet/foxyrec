@@ -2,6 +2,9 @@
 import uuid
 
 from django.db import models
+from django.conf import settings
+
+AUTH_USER_MODEL = getattr(settings, 'AUTH_USER_MODEL', 'auth.User')
 
 
 class Usuario(models.Model):
@@ -24,6 +27,7 @@ class Usuario(models.Model):
     edad = models.IntegerField(choices=RANGO_ETAREO)
     user_id = models.CharField(default=uuid.uuid4, editable=False,
                                max_length=200)
+    usuario = models.ForeignKey(AUTH_USER_MODEL, blank=True, null=True)
 
 
 class Item(models.Model):
