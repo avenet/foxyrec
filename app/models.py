@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import uuid
+
 from django.db import models
 
 
@@ -8,6 +9,7 @@ class Usuario(models.Model):
         (1, 'Mujer'),
         (2, 'Hombre')
     )
+
     RANGO_ETAREO = (
         (1, 'Menor a 15 años'),
         (2, '15 a 20 años'),
@@ -17,6 +19,7 @@ class Usuario(models.Model):
         (6, '51 a 60 años'),
         (7, 'más de 60 años')
     )
+
     sexo = models.IntegerField(choices=SEXO)
     edad = models.IntegerField(choices=RANGO_ETAREO)
     user_id = models.CharField(default=uuid.uuid4, editable=False,
@@ -26,6 +29,8 @@ class Usuario(models.Model):
 class Item(models.Model):
     foto = models.URLField()
     descripcion = models.CharField(max_length=200)
+    activo = models.BooleanField(default=True)
+    valido = models.BooleanField(default=True)
 
     def save(self, force_insert=False, force_update=False, using=None,
              update_fields=None):
