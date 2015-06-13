@@ -40,5 +40,5 @@ class Item(models.Model):
 class Seleccion(models.Model):
     usuario = models.ForeignKey('Usuario')
     item = models.ForeignKey('Item')
-    me_gusta = models.BooleanField(default=False)
+    me_gusta = models.NullBooleanField(default=False)
     timestamp = models.DateTimeField(auto_now=True)

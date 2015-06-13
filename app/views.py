@@ -39,6 +39,8 @@ def loop(request, user_id):
 
             if 'dislike' in request.POST:
                 me_gusta = False
+            elif 'skip' in request.POST:
+                me_gusta = None
 
             usuario = Usuario.objects.filter(user_id=user_id).first()
 
