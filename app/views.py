@@ -1,11 +1,13 @@
 from random import randint
 
 from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
 
 from .forms import SeleccionForm, UsuarioForm
 from .models import Item, Usuario
 
 
+@login_required
 def inicio(request):
     # A HTTP POST?
     if request.method == 'POST':
@@ -24,6 +26,7 @@ def inicio(request):
     })
 
 
+@login_required
 def loop(request, user_id):
     # A HTTP POST?
     foto = ""
