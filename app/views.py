@@ -138,7 +138,7 @@ def _update_prediction_item(seleccion_id):
 
     sexo = seleccion.usuario.sexo == 1 and 'Mujer' or 'Hombre'
     edad = _get_edad_string(seleccion.usuario.edad)
-    item = "ID:" + seleccion.item.pk
+    item = "ID:" + str(seleccion.item.pk)
     like = seleccion.me_gusta == 1 and 'Me gusta' or 'No me gusta'
 
     query = "{}, {}, {}, {}".format(item, like , sexo, edad)
