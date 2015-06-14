@@ -10,7 +10,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 
 from .forms import SeleccionForm, UsuarioForm
-from .models import Item, Usuario
+from .models import Item, Usuario, Seleccion
 
 
 @login_required
@@ -124,3 +124,40 @@ def _get_prediction_item(user_id):
         return int(item_id[1])
 
     return None
+
+def _update_prediction_item(seleccion_id):
+
+    seleccion = Seleccion.objects.get(pk=seleccion_id)
+
+    client_email = settings.GOOGLE_PREDICTIONS_CLIENT_EMAIL
+    private_key = settings.GOOGLE_PREDICTIONS_PRIVATE_KEY
+
+    credentials = SignedJwtAssertionCredentials(client_email, private_key, settings.GOOGLE_PREDICTIONS_URL)
+
+    sexo = seleccion.usuario.sexo == 1 and 'Mujer' or 'Hombre'
+    edad = _get_edad_string(seleccion.usuario.edad)
+    item = "ID:" + seleccion.item.pk
+    like = seleccion.me_gusta == 1 and 'Me gusta' or 'No me gusta'
+
+    query = "{}, {}, {}, {}".format(item, like , sexo, edad)
+
+    http = httplib2.Http()
+    http = credentials.authorize(http)
+
+    service = build('prediction', 'v1.6', http=http)
+    service.trainedmodels().update(id='model001', project='foxyrec-demo',
+	    body={'output': '',  'csvInstance': [str(query)]}).execute()
+
+    return None
+
+def _get_edad_string(edad):
+    edades = {
+        1: 'Menor a 15 años',
+        2: '15 a 20 años',
+        3: '21 a 30 años',
+        4: '31 a 40 años',
+        5: '41 a 50 años',
+        6: '51 a 60 años',
+        7: 'más de 60 años',
+    }
+    return edades[edad]
