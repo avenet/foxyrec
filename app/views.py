@@ -64,9 +64,9 @@ def loop(request, user_id):
             form.usuario = usuario
             form.item = item
             form.me_gusta = me_gusta
-            form.save()
+            instance = form.save()
 
-            _update_prediction_item(form.instance.pk)
+            _update_prediction_item(instance.pk)
 
             return redirect("loop", user_id=usuario.user_id)
         else:
