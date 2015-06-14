@@ -93,7 +93,8 @@ def _get_prediction_item(user_id):
     client_email = settings.GOOGLE_PREDICTIONS_CLIENT_EMAIL
     private_key = settings.GOOGLE_PREDICTIONS_PRIVATE_KEY
 
-    credentials = SignedJwtAssertionCredentials(client_email, private_key, settings.GOOGLE_PREDICTIONS_URL)
+    credentials = SignedJwtAssertionCredentials(client_email, private_key,
+                                                settings.GOOGLE_PREDICTIONS_URL)
 
     sexo = usuario.sexo == 1 and 'Mujer' or 'Hombre'
     edad = _get_edad_string(usuario.edad)
@@ -117,7 +118,7 @@ def _get_prediction_item(user_id):
     ).execute()
 
     output_multi = result['outputMulti']
-    output_multi.sort(key = lambda x : x['score'])
+    output_multi.sort(key=lambda x: x['score'])
 
 
 
@@ -127,6 +128,8 @@ def _get_prediction_item(user_id):
     selecciones_usuario = Seleccion.objects.filter(
         usuario=usuario).order_by('-pk')[0:1]
 
+    result_item = None
+    
     if selecciones_usuario:
         id_ultima_seleccion = selecciones_usuario[0].pk
 
@@ -137,10 +140,10 @@ def _get_prediction_item(user_id):
         for i in xrange(len(output_multi)):
             current_item = output_multi[i]
             if current_item['label'] == item_label:
-                result_item = output_multi[(i+1) % len(output_multi)]
+                result_item = output_multi[(i + 1) % len(output_multi)]
                 break
 
-    #Label del item
+    # Label del item
     identifier_info = result_item['label']
 
     cleaned_id_info = identifier_info.replace('"', '')
@@ -152,30 +155,33 @@ def _get_prediction_item(user_id):
 
     return None
 
-def _update_prediction_item(seleccion_id):
 
+def _update_prediction_item(seleccion_id):
     seleccion = Seleccion.objects.get(pk=seleccion_id)
 
     client_email = settings.GOOGLE_PREDICTIONS_CLIENT_EMAIL
     private_key = settings.GOOGLE_PREDICTIONS_PRIVATE_KEY
 
-    credentials = SignedJwtAssertionCredentials(client_email, private_key, settings.GOOGLE_PREDICTIONS_URL)
+    credentials = SignedJwtAssertionCredentials(client_email, private_key,
+                                                settings.GOOGLE_PREDICTIONS_URL)
 
     sexo = seleccion.usuario.sexo == 1 and 'Mujer' or 'Hombre'
     edad = _get_edad_string(seleccion.usuario.edad)
     item = "ID:" + str(seleccion.item.pk)
     like = seleccion.me_gusta == 1 and 'Me gusta' or 'No me gusta'
 
-    query = "{}, {}, {}, {}".format(item, like , sexo, edad)
+    query = "{}, {}, {}, {}".format(item, like, sexo, edad)
 
     http = httplib2.Http()
     http = credentials.authorize(http)
 
     service = build('prediction', 'v1.6', http=http)
     service.trainedmodels().update(id='model001', project='foxyrec-demo',
-	    body={'output': '',  'csvInstance': [str(query)]}).execute()
+                                   body={'output': '',
+                                         'csvInstance': [str(query)]}).execute()
 
     return None
+
 
 def _get_edad_string(edad):
     edades = {
