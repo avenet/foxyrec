@@ -66,6 +66,8 @@ def loop(request, user_id):
             form.me_gusta = me_gusta
             form.save()
 
+            _update_prediction_item(form.instance.pk)
+
             return redirect("loop", user_id=usuario.user_id)
         else:
             # The supplied form contained errors - just print them to the terminal.
@@ -94,9 +96,9 @@ def _get_prediction_item(user_id):
     credentials = SignedJwtAssertionCredentials(client_email, private_key, settings.GOOGLE_PREDICTIONS_URL)
 
     sexo = usuario.sexo == 1 and 'Mujer' or 'Hombre'
-    edad = usuario.edad
+    edad = _get_edad_string(usuario.edad)
 
-    query = "Me gusta, {}, Menor a {} años".format(sexo, edad)
+    query = "Me gusta, {}, {}".format(sexo, edad)
 
     http = httplib2.Http()
     http = credentials.authorize(http)
