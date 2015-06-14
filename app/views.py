@@ -108,7 +108,7 @@ def _get_prediction_item(user_id):
         id='model001',
         project='foxyrec-demo',
         prettyPrint='true',
-        fields='outputLabel',
+        fields='outputMulti',
         body={
             'input': {
                 'csvInstance': [str(query)]
