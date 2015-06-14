@@ -1,5 +1,11 @@
-from random import randint
+# -*- coding: utf-8 -*-
+import json
+import httplib2
 
+from apiclient.discovery import build
+from oauth2client.client import SignedJwtAssertionCredentials
+
+from django.conf import settings
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 
@@ -66,9 +72,8 @@ def loop(request, user_id):
             print form.errors
     else:
         # If the request was not a POST, display the form to enter details.
-        count = Item.objects.all().count() - 1
-        rand = randint(0, count)
-        item = Item.objects.all()[rand]
+        item_id = _get_prediction_item(user_id)
+        item = Item.objects.get(pk=item_id)
         foto = item.foto
         desc = item.descripcion
         form = SeleccionForm(initial={'usuario': user_id, 'item': item.pk})
@@ -78,3 +83,44 @@ def loop(request, user_id):
         'foto': foto,
         'desc': desc
     })
+
+
+def _get_prediction_item(user_id):
+    usuario = Usuario.objects.get(user_id=user_id)
+
+    client_email = settings.GOOGLE_PREDICTIONS_CLIENT_EMAIL
+    private_key = settings.GOOGLE_PREDICTIONS_PRIVATE_KEY
+
+    credentials = SignedJwtAssertionCredentials(client_email, private_key, settings.GOOGLE_PREDICTIONS_URL)
+
+    sexo = usuario.sexo == 1 and 'Mujer' or 'Hombre'
+    edad = usuario.edad
+
+    query = "Me gusta, {}, Menor a {} años".format(sexo, edad)
+
+    http = httplib2.Http()
+    http = credentials.authorize(http)
+
+    service = build('prediction', 'v1.6', http=http)
+    result = service.trainedmodels().predict(
+        id='model001',
+        project='foxyrec-demo',
+        prettyPrint='true',
+        fields='outputLabel',
+        body={
+            'input': {
+                'csvInstance': [str(query)]
+            }
+        }
+    ).execute()
+
+    identifier_info = result['outputLabel']
+
+    cleaned_id_info = identifier_info.replace('"', '')
+
+    item_id = cleaned_id_info.split(':')
+
+    if len(item_id) > 1:
+        return int(item_id[1])
+
+    return None
