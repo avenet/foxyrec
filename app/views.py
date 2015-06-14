@@ -117,7 +117,7 @@ def _get_prediction_item(user_id):
     ).execute()
 
     output_multi = result['outputMulti']
-    ordered_output = output_multi.sort(key = lambda x : x['score'])
+    output_multi.sort(key = lambda x : x['score'])
 
 
 
@@ -131,13 +131,13 @@ def _get_prediction_item(user_id):
         id_ultima_seleccion = selecciones_usuario[0].pk
 
     if not id_ultima_seleccion:
-        result_item = ordered_output[0]
+        result_item = output_multi[0]
     else:
         item_label = 'ID:{}'.format(id_ultima_seleccion)
-        for i in xrange(len(ordered_output)):
-            current_item = ordered_output[i]
+        for i in xrange(len(output_multi)):
+            current_item = output_multi[i]
             if current_item['label'] == item_label:
-                result_item = ordered_output[(i+1) % len(ordered_output)]
+                result_item = output_multi[(i+1) % len(output_multi)]
                 break
 
     #Label del item
