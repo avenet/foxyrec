@@ -131,12 +131,12 @@ def _get_prediction_item(user_id):
     result_item = None
     
     if selecciones_usuario:
-        id_ultima_seleccion = selecciones_usuario[0].pk
+        id_ultima_seleccion = selecciones_usuario[0].item.pk
 
     if not id_ultima_seleccion:
         result_item = output_multi[0]
     else:
-        item_label = 'ID:{}'.format(id_ultima_seleccion)
+        item_label = '"ID:{}"'.format(id_ultima_seleccion)
         for i in xrange(len(output_multi)):
             current_item = output_multi[i]
             if current_item['label'] == item_label:
@@ -144,6 +144,7 @@ def _get_prediction_item(user_id):
                 break
 
     # Label del item
+
     identifier_info = result_item['label']
 
     cleaned_id_info = identifier_info.replace('"', '')
