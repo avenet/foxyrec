@@ -59,14 +59,14 @@ def loop(request, user_id):
 
             item = Item.objects.get(pk=item_id)
 
-            form = form.save(commit=False)
+            seleccion = form.save(commit=False)
 
-            form.usuario = usuario
-            form.item = item
-            form.me_gusta = me_gusta
-            instance = form.save()
+            seleccion.usuario = usuario
+            seleccion.item = item
+            seleccion.me_gusta = me_gusta
+            seleccion.save()
 
-            _update_prediction_item(instance.pk)
+            _update_prediction_item(seleccion.id)
 
             return redirect("loop", user_id=usuario.user_id)
         else:
