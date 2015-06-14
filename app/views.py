@@ -116,7 +116,32 @@ def _get_prediction_item(user_id):
         }
     ).execute()
 
-    identifier_info = result['outputLabel']
+    output_multi = result['outputMulti']
+    ordered_output = output_multi.sort(key = lambda x : x['score'])
+
+
+
+    # Check latest item for user X
+    id_ultima_seleccion = None
+
+    selecciones_usuario = Seleccion.objects.filter(
+        usuario=usuario).order_by('-pk')[0:1]
+
+    if selecciones_usuario:
+        id_ultima_seleccion = selecciones_usuario[0].pk
+
+    if not id_ultima_seleccion:
+        result_item = ordered_output[0]
+    else:
+        item_label = 'ID:{}'.format(id_ultima_seleccion)
+        for i in xrange(len(ordered_output)):
+            current_item = ordered_output[i]
+            if current_item['label'] == item_label:
+                result_item = ordered_output[(i+1) % len(ordered_output)]
+                break
+
+    #Label del item
+    identifier_info = result_item['label']
 
     cleaned_id_info = identifier_info.replace('"', '')
 
